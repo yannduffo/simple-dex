@@ -8,6 +8,9 @@
   },
   "dependencies": {
     "@openzeppelin/contracts": "^4.9.3",
+    "bn": "^1.0.5",
+    "chai": "^4.2.0",
+    "chai-bn": "^0.3.1",
     "command-exists": "^1.2.9",
     "commander": "^8.3.0",
     "follow-redirects": "^1.15.9",
@@ -16,7 +19,8 @@
     "os-tmpdir": "^1.0.2",
     "semver": "^5.7.2",
     "solc": "^0.8.20",
-    "tmp": "^0.0.33"
+    "tmp": "^0.0.33",
+    "web3": "^4.16.0"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
