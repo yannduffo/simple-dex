@@ -23,6 +23,15 @@ contract DexPool {
     //defining liquidity token (type of our other contract)
     DexLiquidityToken public liquidityToken;
 
+    //defining event
+    event Swap(
+        address indexed sender,
+        uint256 amountIn,
+        uint256 amountOut,
+        address tokenIn,
+        address tokenOut
+    );
+
     constructor(
         address _token1,
         address _token2,
@@ -86,7 +95,7 @@ contract DexPool {
     function removeLiquidity(uint amountOfLiquidity) external {
         uint256 totalLiquidityTokenSupply = liquidityToken.totalSupply();
 
-        //checkings
+        //checkings -----------------------------------------------------------------------------------------
         require(
             amountOfLiquidity <= totalLiquidityTokenSupply,
             "Error, Liquidity asked to remove is more than total supply"
@@ -118,6 +127,87 @@ contract DexPool {
 
         //update the constant formula ------------------------------------------------------------------------
         _updateConstantFormula();
+    }
+
+    function swapTokens(
+        address fromToken,
+        address toToken,
+        uint256 amountIn,
+        uint256 amountOut
+    ) external {
+        //checkings -----------------------------------------------------------------------------------------
+        require(
+            amountIn > 0 && amountOut > 0,
+            "Error, amounts must be greater than 0"
+        );
+        require(
+            (fromToken == token1 && toToken == token2) ||
+                (fromToken == token2 && toToken == token1),
+            "Error, Tokens need to be pairs of the liquidity pool"
+        );
+        //checking balances to see if the swap is possible
+        //(enough tokenFrom on the sender address AND enough tokenTo on the liquidity pool)
+        IERC20 fromTokenContract = IERC20(fromToken);
+        IERC20 toTokenContract = IERC20(toToken);
+        require(
+            fromTokenContract.balanceOf(msg.sender) >= amountIn,
+            "Error, insufficient balance of tokenFrom"
+        );
+        require(
+            toTokenContract.balanceOf(address(this)) >= amountOut,
+            "Error, insufficient balance of tokenTo"
+        );
+
+        //verify that amountOut is less or equal to expected amount after calculation ----------------------
+        //calculation logic :
+        //in case amountIn token1 reserve1 and amountOut token2 reserve2
+        //we want to keep this formula true : reserve1 * reserve2 = constantK
+        // (reserve1 + amountIn) * (reserve2 - expectedAmountOut) = constantK
+        //so expectedAmountOut = reserve2 - constantK/(reserve1 + amountIn)
+        uint256 expectedAmountOut;
+        if (fromToken == token1 && toToken == token2) {
+            expectedAmountOut = reserve2.sub(
+                constantK.div(reserve1.add(amountIn))
+            );
+        } else {
+            expectedAmountOut = reserve1.sub(
+                constantK.div(reserve2.add(amountIn))
+            );
+        }
+        //verify amounts out coherence (to check if the promise amount is inferior or equal to real one)
+        require(
+            amountOut <= expectedAmountOut,
+            "Swap does not preserve constant formula"
+        );
+
+        //perform the swap : transfer amountIn to pool, transfer amountOut from the pool to sender ----------
+        require(
+            fromTokenContract.transferFrom(msg.sender, address(this), amountIn),
+            "Error, transfer of tokenFrom failed"
+        );
+        require(
+            toTokenContract.transfer(msg.sender, expectedAmountOut),
+            "Error, transfer of tokenTo failed"
+        );
+
+        //upload reserve1 and reserve2 ----------------------------------------------------------------------
+        if (fromToken == token1 && toToken == token2) {
+            reserve1 = reserve1.add(amountIn);
+            reserve2 = reserve2.sub(expectedAmountOut);
+        } else {
+            reserve2 = reserve2.add(amountIn);
+            reserve1 = reserve1.sub(expectedAmountOut);
+        }
+
+        //check that the result is maintaining the constant formula (x*y=K) and update formula---------------
+        require(
+            reserve1.mul(reserve2) <= constantK,
+            "Error, swap does not preserve constant formula"
+        );
+        _updateConstantFormula();
+
+        //add events ----------------------------------------------------------------------------------------
+        emit Swap(msg.sender, amountIn, expectedAmountOut, fromToken, toToken);
     }
 
     function _updateConstantFormula() internal {
