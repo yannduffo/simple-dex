@@ -20,7 +20,7 @@ contract DexPool {
     // AMM gestion of liquidity pool follows x * y = K
     uint256 public constantK;
 
-    //defining liquidity token
+    //defining liquidity token (type of our other contract)
     DexLiquidityToken public liquidityToken;
 
     constructor(
@@ -80,7 +80,48 @@ contract DexPool {
         reserve2 += amountToken2;
 
         //update the constant formula ------------------------------------------------------------------------
+        _updateConstantFormula();
+    }
+
+    function removeLiquidity(uint amountOfLiquidity) external {
+        uint256 totalLiquidityTokenSupply = liquidityToken.totalSupply();
+
+        //checkings
+        require(
+            amountOfLiquidity <= totalLiquidityTokenSupply,
+            "Error, Liquidity asked to remove is more than total supply"
+        );
+
+        //burn the amount of liquidityToken asked by the sender ----------------------------------------------
+        liquidityToken.burn(msg.sender, amountOfLiquidity);
+
+        //transfer the token1 and token2 to the liquidity provider (msg.sender) ------------------------------
+        // calculate amount to transfer
+        uint256 amount1 = (reserve1 * amountOfLiquidity) /
+            totalLiquidityTokenSupply;
+        uint256 amount2 = (reserve2 * amountOfLiquidity) /
+            totalLiquidityTokenSupply;
+
+        //transfer back the token1 and token2
+        require(
+            IERC20(token1).transfer(msg.sender, amount1),
+            "Error, transfer of token1 failed"
+        );
+        require(
+            IERC20(token2).transfer(msg.sender, amount2),
+            "Error, transfer of token2 failed"
+        );
+
+        //update reserve1 and reserve2 -----------------------------------------------------------------------
+        reserve1 -= amount1;
+        reserve2 -= amount2;
+
+        //update the constant formula ------------------------------------------------------------------------
+        _updateConstantFormula();
+    }
+
+    function _updateConstantFormula() internal {
         constantK = reserve1.mul(reserve2);
-        require(constantK > 0, "Error, Constant fromula not updated");
+        require(constantK > 0, "Error, constant fromula not updated");
     }
 }

@@ -20,4 +20,12 @@ contract DexLiquidityToken is ERC20, AccessControl {
     ) external onlyRole(DEFAULT_ADMIN_ROLE) {
         _mint(to, amount);
     }
+
+    //creating external burn func as the minting one
+    function burn(
+        address to,
+        uint256 amount
+    ) external onlyRole(DEFAULT_ADMIN_ROLE) {
+        _burn(to, amount);
+    }
 }
