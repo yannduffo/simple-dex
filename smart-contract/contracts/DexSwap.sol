@@ -27,8 +27,21 @@ contract DexSwap {
             "Pair already exists"
         );
 
+        //dynamic liquidity token name and symbol definition
+        string memory liquidityTokenName = string(
+            abi.encodePacked("Liquid-", token1Name, "-", token2Name)
+        );
+        string memory liquidityTokenSymbol = string(
+            abi.encodePacked("LP-", token1Name, "-", token2Name)
+        );
+
         //pool creation
-        DexPool dexPool = new DexPool();
+        DexPool dexPool = new DexPool(
+            token1,
+            token2,
+            liquidityTokenName,
+            liquidityTokenSymbol
+        );
         getPair[token1][token2] = dexPool;
         getPair[token2][token1] = dexPool; //pools are bidirectionals
         allPairs.push(address(dexPool));
