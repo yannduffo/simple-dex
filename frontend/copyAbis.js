@@ -24,6 +24,7 @@ fs.readdir(tragetDir, (err, file) => {
                 if (err) console.error("Error while deleting ABI files", err);
             });
         });
+        console.log("All ABI files deleted");
     }
 });
 
