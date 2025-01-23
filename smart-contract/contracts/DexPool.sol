@@ -23,13 +23,23 @@ contract DexPool {
     //defining liquidity token (type of our other contract)
     DexLiquidityToken public liquidityToken;
 
-    //defining event
+    //defining events
     event Swap(
         address indexed sender,
         uint256 amountIn,
         uint256 amountOut,
         address tokenIn,
         address tokenOut
+    );
+    event LiquidityAdded(
+        address indexed provider,
+        uint256 amountToken1,
+        uint256 amountToken2
+    );
+    event LiquidityRemoved(
+        address indexed provider,
+        uint256 amountToken1,
+        uint amountToken2
     );
 
     constructor(
@@ -48,6 +58,12 @@ contract DexPool {
     }
 
     function addLiquidity(uint amountToken1, uint amountToken2) external {
+        //checkings ------------------------------------------------------------------------------------------
+        require(
+            amountToken1 > 0 && amountToken2 > 0,
+            "Error, amount must be greater than 0"
+        );
+
         //create and send liquidityTokens to liquidity provider ----------------------------------------------
         uint256 liquidity;
         uint256 totalSupplyOfToken = liquidityToken.totalSupply();
@@ -90,12 +106,19 @@ contract DexPool {
 
         //update the constant formula ------------------------------------------------------------------------
         _updateConstantFormula();
+
+        //emit event -----------------------------------------------------------------------------------------
+        emit LiquidityAdded(msg.sender, amountToken1, amountToken2);
     }
 
     function removeLiquidity(uint amountOfLiquidity) external {
         uint256 totalLiquidityTokenSupply = liquidityToken.totalSupply();
 
         //checkings -----------------------------------------------------------------------------------------
+        require(
+            amountOfLiquidity > 0,
+            "Amount of liquidity must be greater than 0"
+        );
         require(
             amountOfLiquidity <= totalLiquidityTokenSupply,
             "Error, Liquidity asked to remove is more than total supply"
@@ -106,10 +129,12 @@ contract DexPool {
 
         //transfer the token1 and token2 to the liquidity provider (msg.sender) ------------------------------
         // calculate amount to transfer
-        uint256 amount1 = (reserve1 * amountOfLiquidity) /
-            totalLiquidityTokenSupply;
-        uint256 amount2 = (reserve2 * amountOfLiquidity) /
-            totalLiquidityTokenSupply;
+        uint256 amount1 = (reserve1.mul(amountOfLiquidity)).div(
+            totalLiquidityTokenSupply
+        );
+        uint256 amount2 = (reserve2.mul(amountOfLiquidity)).div(
+            totalLiquidityTokenSupply
+        );
 
         //transfer back the token1 and token2
         require(
@@ -127,6 +152,9 @@ contract DexPool {
 
         //update the constant formula ------------------------------------------------------------------------
         _updateConstantFormula();
+
+        //emit event -----------------------------------------------------------------------------------------
+        emit LiquidityRemoved(msg.sender, amount1, amount2);
     }
 
     function swapTokens(
@@ -159,25 +187,27 @@ contract DexPool {
         );
 
         //verify that amountOut is less or equal to expected amount after calculation ----------------------
+        uint256 expectedAmountOut;
+        uint256 effectiveAmountIn = amountIn.mul(997).div(1000); // 0,3% of fee applied on amountIn
+
         //calculation logic :
         //in case amountIn token1 reserve1 and amountOut token2 reserve2
         //we want to keep this formula true : reserve1 * reserve2 = constantK
         // (reserve1 + amountIn) * (reserve2 - expectedAmountOut) = constantK
         //so expectedAmountOut = reserve2 - constantK/(reserve1 + amountIn)
-        uint256 expectedAmountOut;
         if (fromToken == token1 && toToken == token2) {
             expectedAmountOut = reserve2.sub(
-                constantK.div(reserve1.add(amountIn))
+                constantK.div(reserve1.add(effectiveAmountIn))
             );
         } else {
             expectedAmountOut = reserve1.sub(
-                constantK.div(reserve2.add(amountIn))
+                constantK.div(reserve2.add(effectiveAmountIn))
             );
         }
         //verify amounts out coherence (to check if the promise amount is inferior or equal to real one)
         require(
             amountOut <= expectedAmountOut,
-            "Swap does not preserve constant formula"
+            "Promise out amount is lower than final amountOut"
         );
 
         //perform the swap : transfer amountIn to pool, transfer amountOut from the pool to sender ----------
@@ -201,12 +231,12 @@ contract DexPool {
 
         //check that the result is maintaining the constant formula (x*y=K) and update formula---------------
         require(
-            reserve1.mul(reserve2) <= constantK,
+            reserve1.mul(reserve2) >= constantK, //supposed to be a bit greater after the fees have been added
             "Error, swap does not preserve constant formula"
         );
         _updateConstantFormula();
 
-        //add events ----------------------------------------------------------------------------------------
+        //emit events ----------------------------------------------------------------------------------------
         emit Swap(msg.sender, amountIn, expectedAmountOut, fromToken, toToken);
     }
 
