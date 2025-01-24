@@ -244,4 +244,19 @@ contract DexPool {
         constantK = reserve1.mul(reserve2);
         require(constantK > 0, "Error, constant fromula not updated");
     }
+
+    //returning the minimum expectedAmountOut for a swap (used by frontend)
+    function getExpectedAmountOut(
+        address fromToken,
+        address toToken,
+        uint256 amountIn
+    ) external view returns (uint256) {
+        uint256 effectiveAmountIn = amountIn.mul(997).div(1000); // 0,3% of fee applied on amountIn
+
+        if (fromToken == token1 && toToken == token2) {
+            return reserve2.sub(constantK.div(reserve1.add(effectiveAmountIn)));
+        } else {
+            return reserve1.sub(constantK.div(reserve2.add(effectiveAmountIn)));
+        }
+    }
 }

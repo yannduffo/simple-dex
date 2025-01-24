@@ -14,9 +14,12 @@ const Swap = () => {
         const accounts = await window.ethereum.request({method: 'eth_requestAccounts'});
         const account = accounts[0];
 
-        //calculate theorical amountOut
-        //for a 1 to 1 conversion rate, the expected amountOut should be amountIn - fee
-        setAmountOut(amountIn * 0.95); //95% de amountIn 
+        //getting expectedAmountOut from the SC
+        const expectedAmountOut = await dexPool.methods.getExpectedAmountOut(tokenA, tokenB, amountIn).call();
+        setAmountOut(expectedAmountOut);
+
+        console.log("amountIn : ", amountIn);
+        console.log("amountOut : ", amountOut);
 
         //swaping
         await dexPool.methods.swapTokens(tokenA, tokenB, amountIn, amountOut).send({from: account});
