@@ -4,7 +4,7 @@ const path = require("path");
 async function cleanAndCopy() {
     //defining paths
     const sourceDir = path.resolve(__dirname, '../smart-contract/build/contracts');
-    const tragetDir = path.resolve(__dirname, './src/abi');
+    const tragetDir = path.resolve(__dirname, './src/assets/abi');
 
     //check that the 2 directories exist
     if(!await fs.access(sourceDir).then(() => true).catch(() => false)) {
@@ -12,8 +12,8 @@ async function cleanAndCopy() {
         process.exit(1);
     }
     if(!await fs.access(tragetDir).then(() => true).catch(() => false)) {
-        console.error("The ABI files target dir does not exist", tragetDir);
-        process.exit(1);
+        console.error("The ABI files target dir does not exist, creating dir ...", tragetDir);
+        await fs.mkdir(tragetDir, {recursive: true});
     }
 
     try {
