@@ -6,6 +6,7 @@ const Navbar = () => {
         <nav>
             <Link to="/swap">Swap</Link>
             <Link to="/pool">Pool</Link>
+            <Link to='/token'>Token(dev)</Link>
         </nav>
     );
 };
