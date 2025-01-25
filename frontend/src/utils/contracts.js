@@ -31,9 +31,9 @@ export const dexFactory = new web3.eth.Contract(DexFactory.abi, dexFactoryAddres
 
 // TODO dynamicaly manage more than 2 tokens
 //validate token addresses
-if(!tokenAddresses.tokenABC || tokenAddresses.tokenDEF) {
+if(!tokenAddresses.tokenABC || !tokenAddresses.tokenDEF) {
     console.error("Token addresses are missing");
-    throw new Error("Token addresses not found in deployedToken.json file");
+    throw new Error("Token addresses not found in deployedTokens.json file");
 }
 
 //creating web3.contract instances for tokenABC and tokenDEF 
