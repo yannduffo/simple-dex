@@ -17,4 +17,7 @@ module.exports = async function (deployer) {
         tokenDEF : tokenDEF.address,
     };
     fs.writeFileSync("build/deployedTokens.json", JSON.stringify(tokenAddresses, null, 2), "utf-8");
+
+    console.log("TokenABC deployed at : ", tokenABC.address);
+    console.log("TokenDEF deployed at : ", tokenDEF.address);
 };

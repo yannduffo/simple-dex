@@ -259,4 +259,23 @@ contract DexPool {
             return reserve1.sub(constantK.div(reserve2.add(effectiveAmountIn)));
         }
     }
+
+    //returning reserve values
+    function getReserves()
+        public
+        view
+        returns (uint valueReserve1, uint valueReserve2)
+    {
+        valueReserve1 = IERC20(token1).balanceOf(address(this));
+        valueReserve2 = IERC20(token2).balanceOf(address(this));
+        return (valueReserve1, valueReserve2);
+    }
+
+    function getTokenAddresses()
+        public
+        view
+        returns (address addToken1, address addrToken2)
+    {
+        return (token1, token2);
+    }
 }
