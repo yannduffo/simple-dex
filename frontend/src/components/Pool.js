@@ -1,5 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import { dexFactory } from '../utils/contracts';
+import { addLiquidity } from '../utils/poolContract';
 import web3 from '../utils/web3';
 
 //import components
@@ -10,9 +11,13 @@ const Pool = () => {
     const [pools, setPools] = useState([]);
     const [loading, setLoading] = useState(true);
     const [connectedAccount, setConnectedAccount] = useState(null);
-    //form inputs
+    //form inputs for creating a pool
     const [tokenA, setTokenA] = useState('');
     const [tokenB, setTokenB] = useState('');
+    //form inputs for adding liquidity
+    const [amountToken1, setAmountToken1] = useState('');
+    const [amountToken2, setAmountToken2] = useState('');
+    const [selectedPool, setSelectedPool] = useState('');
 
     //load existing pools
     useEffect(() => {
@@ -60,6 +65,34 @@ const Pool = () => {
         }
     }
 
+    //adding liquidity
+    const handleAddLiquidity = async () => {
+        //checkings
+        if(!connectedAccount) {
+            alert("Please connect a wallet first"); 
+            return;
+        }
+        if(!web3.utils.isAddress(selectedPool)){
+            alert("Invalid pool address");
+            return;
+        }
+        if(!amountToken1 || !amountToken2){
+            alert("Please provide valid amount for tokenA tokenB");
+            return;
+        }
+
+        //calling function from utils/poolContracts.js
+        try {
+            setLoading(true);
+            await addLiquidity(selectedPool, amountToken1, amountToken2, connectedAccount);
+            alert("Liquidity successfully added");
+        } catch (err) {
+            console.error("Error while adding Liquidity", err);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     if(loading) return <p>Loading...</p>
 
     return(
@@ -76,15 +109,33 @@ const Pool = () => {
                 pools.map((pool, index) => <PoolItem key={index} poolAddress={pool}/>)
             )}
             </div>
-            <p>Add a new pool</p>
-            <label>
-                TokenA address
-                <input type='text' value={tokenA} onChange={(e) => setTokenA(e.target.value)}/>
-            </label>
-            <label>TokenB address
-                <input type='text' value={tokenB} onChange={(e) => setTokenB(e.target.value)}/>
-            </label>
-            <button onClick={createPool} disabled={!connectedAccount || loading}>Create pool</button>
+            <div>
+                <p>Add a new pool</p>
+                <label>
+                    TokenA address
+                    <input type='text' value={tokenA} onChange={(e) => setTokenA(e.target.value)}/>
+                </label>
+                <label>TokenB address
+                    <input type='text' value={tokenB} onChange={(e) => setTokenB(e.target.value)}/>
+                </label>
+                <button onClick={createPool} disabled={!connectedAccount || loading}>Create pool</button>
+            </div>
+            <div>
+                <p>Add liquidity</p>
+                <label>
+                    Pool address
+                    <input type='text' value={selectedPool} onChange={(e) => setSelectedPool(e.target.value)}/>
+                </label>
+                <label>
+                    Token1 amount
+                    <input type='text' value={amountToken1} onChange={(e) => setAmountToken1(e.target.value)}/>
+                </label>
+                <label>
+                    Token2 amount
+                    <input type='text' value={amountToken2} onChange={(e) => setAmountToken2(e.target.value)}/>
+                </label>
+                <button onClick={handleAddLiquidity} disabled={!connectedAccount || loading}>Add Liquidity</button>
+            </div>
         </div>
     );
 };
