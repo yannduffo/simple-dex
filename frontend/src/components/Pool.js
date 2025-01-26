@@ -2,6 +2,10 @@ import React, {useState, useEffect} from 'react';
 import { dexFactory } from '../utils/contracts';
 import web3 from '../utils/web3';
 
+//import components
+import WalletBox from './WalletBox';
+import PoolItem from './PoolItem';
+
 const Pool = () => {
     const [pools, setPools] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -26,17 +30,6 @@ const Pool = () => {
 
         fetchPools();
     }, []);
-
-    //connect Metamask wallet
-    const connectWallet = async () => {
-        try {
-            const accounts = await window.ethereum.request({method: 'eth_requestAccounts'});
-            setConnectedAccount(accounts[0]);
-        } catch (err) {
-            console.error("Error while connecting Metamask wallet", err);
-            alert("Metamask wallet connexion failed");
-        }
-    }
 
     //create a new pool
     const createPool = async () => {
@@ -71,31 +64,18 @@ const Pool = () => {
 
     return(
         <div>
-            <p>Conect wallet</p>
-            { connectedAccount ? (
-                <p>Connected as : {connectedAccount}</p>
-            ) : (
-                <button onClick={connectWallet}>Connect Metamask</button>
-            )}
-            <p>Pools</p>
+            <WalletBox
+                connectedAccount={connectedAccount}
+                setConnectedAccount={setConnectedAccount}
+            />
+            <p>Available pools</p>
+            <div>
             {pools.length === 0 ? (
                 <p>Not any pool created</p>
             ):(
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Pool address</th>
-                        </tr>
-                    </thead>
-                <tbody>
-                    {pools.map((pool, index) => (
-                        <tr key={index}>
-                            <td>{pool}</td>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
+                pools.map((pool, index) => <PoolItem key={index} poolAddress={pool}/>)
             )}
+            </div>
             <p>Add a new pool</p>
             <label>
                 TokenA address
