@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import web3 from '../utils/web3';
 
 //import utils
-import { getPoolAddress} from '../utils/contracts';
-import { getDexPoolContract, approveToken } from '../utils/poolContract';
+import { getPoolAddress} from '../utils/factoryContract';
+import { getDexPoolContract} from '../utils/poolContract';
+import { approveToken } from '../utils/tokenContract';
+import web3 from '../utils/web3';
 
 //import components
 import WalletBox from './WalletBox';

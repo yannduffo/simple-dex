@@ -1,5 +1,7 @@
 import React, {useState, useEffect} from 'react';
-import { dexFactory } from '../utils/contracts';
+
+//import utils
+import { dexFactory } from '../utils/factoryContract';
 import { addLiquidity } from '../utils/poolContract';
 import web3 from '../utils/web3';
 

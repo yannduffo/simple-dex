@@ -1,11 +1,7 @@
-// "token.js" component for dev propose
-// print a list of all fictive token deployed on the simulation blockchain
-// 
-// on a production infrasctucture this could be handle by calling an API 
-// to ask the DEX server what token are managed by the DEX
-
 import React, {useEffect, useState} from 'react';
-import { tokenABCContract, tokenDEFContract } from '../utils/contracts';
+
+//import utils
+import tokenContracts from '../utils/tokenContract';
 
 const Token = () => {
     const [tokens, setTokens] = useState('');
@@ -15,12 +11,11 @@ const Token = () => {
         const fetchTockens = async () => {
             try {
                 //func to get token details
-                const fetchTokenDetails = async (tokenContrat) => {
+                const fetchTokenDetails = async (tokenContrat, tokenAddress) => {
                     try{
                         const name = await tokenContrat.methods.name().call();
                         const symbol = await tokenContrat.methods.symbol().call();
-                        const address = tokenContrat._address;
-                        return {name, symbol, address};
+                        return {name, symbol, address: tokenAddress};
         
                     } catch(err) {
                         console.error("Error during token detail fetching", err);
@@ -29,9 +24,8 @@ const Token = () => {
                 };
         
                 //get details from all fictive tokens
-                const tokenContracts = [tokenABCContract, tokenDEFContract];
                 const tokenDetails = await Promise.all(
-                    tokenContracts.map((contract) => fetchTokenDetails(contract))
+                    Object.entries(tokenContracts).map(([tokenAddress, tokenContrat]) => fetchTokenDetails(tokenContrat, tokenAddress))
                 );
                 setTokens(tokenDetails.filter(Boolean)); //filter to add only valid tokens to local state variable
         

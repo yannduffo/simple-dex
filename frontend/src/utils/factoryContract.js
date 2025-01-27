@@ -1,13 +1,5 @@
-// src/utils/contracts.js
-// creation of web3.contract instances
-
 import web3 from './web3';
 import DexFactory from '../assets/abi/DexFactory.json';
-import ERC20 from '../assets/abi/ERC20.json';
-
-import tokenAddresses from '../assets/config/deployedTokens.json';
-
-// dexFactory contracts ------------------------------------------------------------------------------
 
 //geting network id (the ganache dev network one)
 const networkId = Object.keys(DexFactory.networks)[0]; //using 1st available network
@@ -24,10 +16,17 @@ if(!dexFactoryAddress){
     throw new Error("DexFactory contract adress is missing in the ABI file");
 }
 
-//creating web3.contract instance
+//creating and export web3.contract instance
 export const dexFactory = new web3.eth.Contract(DexFactory.abi, dexFactoryAddress);
 
-//exporting getPoolAddress func
+/**
+ * Get the pool address for a specific token pair
+ * @async
+ * @param {string} addressTokenA 
+ * @param {string} addressTokenB 
+ * @returns {Promise<string>} Pool address if exists
+ * @throws {Error} If no pool exists for this pair of tokens
+ */
 export const getPoolAddress = async (addressTokenA, addressTokenB) => {
     try {
         const poolAddress = await dexFactory.methods.getPoolAddress(addressTokenA, addressTokenB).call();
@@ -41,15 +40,3 @@ export const getPoolAddress = async (addressTokenA, addressTokenB) => {
     }
 }
 
-// token contracts ----------------------------------------------------------------------------------
-
-// TODO dynamicaly manage more than 2 tokens
-//validate token addresses
-if(!tokenAddresses.tokenABC || !tokenAddresses.tokenDEF) {
-    console.error("Token addresses are missing");
-    throw new Error("Token addresses not found in deployedTokens.json file");
-}
-
-//creating web3.contract instances for tokenABC and tokenDEF 
-export const tokenABCContract = new web3.eth.Contract(ERC20.abi, tokenAddresses.tokenABC);
-export const tokenDEFContract = new web3.eth.Contract(ERC20.abi, tokenAddresses.tokenDEF);

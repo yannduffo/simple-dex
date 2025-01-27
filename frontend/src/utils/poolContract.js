@@ -1,8 +1,13 @@
 import web3 from "./web3";
 import DexPool from '../assets/abi/DexPool.json';
-import ERC20 from '../assets/abi/ERC20.json';
+import { approveToken } from "./tokenContract";
 
 // creating a web3.eth.Contract instance for a designted pool
+/**
+ * Creating a web3.eth.Contract instance for a designated pool
+ * @param {string} poolAddress 
+ * @returns {web3.eth.Contract} DexPool contract instance of the designated address
+ */
 export const getDexPoolContract = (poolAddress) => {
     if(!web3.utils.isAddress(poolAddress)) {
         throw new Error(`${poolAddress} is not a valid Ethereum address`);
@@ -11,7 +16,12 @@ export const getDexPoolContract = (poolAddress) => {
     return new web3.eth.Contract(DexPool.abi, poolAddress);
 };
 
-//getting pool detail (tokens and reserve) for a designated pool
+/**
+ * Obtain details from a designated pool (managed tokens and reserves)
+ * @async
+ * @param {string} poolAddress Pool address from which one we want to obtain details
+ * @returns {Promise<JSON>} return infos
+ */
 export const getPoolDetails = async (poolAddress) => {
     //creating contract instance
     const poolContract = getDexPoolContract(poolAddress);
@@ -35,30 +45,25 @@ export const getPoolDetails = async (poolAddress) => {
 
 };
 
-//getting approval to spent tokens
-export const approveToken = async (tokenAddress, spenderAddress, account, amount) => {
-    //cerating instance of token contract
-    const tokenContract = new web3.eth.Contract(ERC20.abi, tokenAddress);
-
-    //getting the approval
-    const amountInWei = web3.utils.toWei(amount.toString(), 'ether');
-    await tokenContract.methods.approve(spenderAddress, amountInWei).send({ from: account });
-
-    console.log(`Approved ${amount} tokens for ${spenderAddress}`);
-};
-
-//adding liquidity to a designated pool
+/**
+ * Add liquidity to a pool
+ * @async
+ * @param {string} poolAddress 
+ * @param {uint} amountToken1 amount in ether
+ * @param {uint} amountToken2 amount in ether
+ * @param {string} account 
+ */
 export const addLiquidity = async (poolAddress, amountToken1, amountToken2, account) => {
     //creating contract instance
     const poolContract = getDexPoolContract(poolAddress);
 
     // getting tokens addresses
-    const token1 = await poolContract.methods.token1().call();
-    const token2 = await poolContract.methods.token2().call();
+    const addressToken1 = await poolContract.methods.token1().call();
+    const addressToken2 = await poolContract.methods.token2().call();
 
     //need approval for DexPool to be able to spend the necessery amount of tokens :
-    await approveToken(token1, poolAddress, account, amountToken1);
-    await approveToken(token2, poolAddress, account, amountToken2);
+    await approveToken(addressToken1, poolAddress, account, amountToken1);
+    await approveToken(addressToken2, poolAddress, account, amountToken2);
 
     //converting everything in wei
     const amountToken1InWei = web3.utils.toWei(amountToken1.toString(), 'ether');
