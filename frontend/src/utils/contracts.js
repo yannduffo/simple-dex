@@ -27,6 +27,20 @@ if(!dexFactoryAddress){
 //creating web3.contract instance
 export const dexFactory = new web3.eth.Contract(DexFactory.abi, dexFactoryAddress);
 
+//exporting getPoolAddress func
+export const getPoolAddress = async (addressTokenA, addressTokenB) => {
+    try {
+        const poolAddress = await dexFactory.methods.getPoolAddress(addressTokenA, addressTokenB).call();
+        if(poolAddress === '0x0000000000000000000000000000000000000000') {
+            throw new Error("No pool exist for this pair of tokens");
+        }
+        return poolAddress;
+    } catch (err) {
+        console.error("Error fetching pool addr", err);
+        throw err;
+    }
+}
+
 // token contracts ----------------------------------------------------------------------------------
 
 // TODO dynamicaly manage more than 2 tokens

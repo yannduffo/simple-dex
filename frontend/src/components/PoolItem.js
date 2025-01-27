@@ -1,4 +1,6 @@
 import React, {useEffect, useState} from "react";
+import web3 from "../utils/web3";
+//import utils
 import { getPoolDetails } from "../utils/poolContract";
 
 const PoolItem = ({poolAddress}) => {
@@ -25,7 +27,7 @@ const PoolItem = ({poolAddress}) => {
             <p>Pool address : {poolAddress}</p>
             <p>Token A : {details.tokenA}</p>
             <p>Token B : {details.tokenB}</p>
-            <p>Reserves : {details.reserves.tokenA} / {details.reserves.tokenB}</p>
+            <p>Reserves : {web3.utils.fromWei(details.reserves.tokenA, 'ether')} / {web3.utils.fromWei(details.reserves.tokenB, 'ether')}</p>
         </div>
     );
 };

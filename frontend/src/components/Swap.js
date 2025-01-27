@@ -1,49 +1,104 @@
 import React, { useState } from 'react';
-//import { dexPool, tokenABCContract } from '../utils/contracts';
 import web3 from '../utils/web3';
 
+//import utils
+import { getPoolAddress} from '../utils/contracts';
+import { getDexPoolContract, approveToken } from '../utils/poolContract';
+
+//import components
+import WalletBox from './WalletBox';
+
 const Swap = () => {
-    // //state variables 
-    // const [tokenA, setTokenA] = useState('');
-    // const [tokenB, setTokenB] = useState('');
-    // const [amountIn, setAmountIn] = useState('');
-    // const [amountOut, setAmountOut] = useState('');
+    //state variables 
+    const [tokenA, setTokenA] = useState('');
+    const [tokenB, setTokenB] = useState('');
+    const [amountIn, setAmountIn] = useState('');
+    const [amountOut, setAmountOut] = useState('');
+    const [poolAddress, setPoolAddress] = useState('');
+    //for account connexion
+    const [connectedAccount, setConnectedAccount] = useState(null)
+    const [loading, setLoading] = useState(false);
 
-    // //handle swap by calling SC
-    // const handleSwap = async () => {
-    //     //get account to use
-    //     const accounts = await window.ethereum.request({method: 'eth_requestAccounts'});
-    //     const account = accounts[0];
+    //handle pool selection
+    const findPool = async () => {
+        try {
+            setLoading(true);
+            const address = await getPoolAddress(tokenA, tokenB);
+            console.log("Pool found : ", address);
+            setPoolAddress(address);
+        } catch (err) {
+            alert("No pool available to swap these 2 tokens")
+            setPoolAddress('');
+        } finally {
+            setLoading(false);
+        }
+    }
 
-    //     //converting amountIn to wei values
-    //     const amountInInWei = web3.utils.toWei(amountIn.toString(), "ether");
+    //handle swap by calling SC
+    const handleSwap = async () => {
+        //cheking
+        if(!poolAddress){
+            alert("No pool found for these pair of tokens")
+        }
 
-    //     //getting expectedAmountOut from the SC
-    //     const expectedAmountOut = await dexPool.methods.getExpectedAmountOut(tokenA, tokenB, amountInInWei).call();
-    //     setAmountOut(expectedAmountOut); //the value retrun already is in WEI
+        try {
+            setLoading(true);
 
-    //     //approve DexPool contract to spend amountIn of TokenA
-    //     await tokenABCContract.methods.approve(dexPool.options.address, amountInInWei).send({from: account});
+            //converting amountIn to wei values
+            const amountInInWei = web3.utils.toWei(amountIn.toString(), "ether");
 
-    //     console.log("amountInWei : ", amountInInWei);
-    //     console.log("amountOut : ", amountOut);
+            //getting expectedAmountOut from the SC
+            const poolContract = getDexPoolContract(poolAddress);
+            const expectedAmountOut = await poolContract.methods.getExpectedAmountOut(tokenA, tokenB, amountInInWei).call();
+            console.log("expectedAmountOut", expectedAmountOut);
+            //console.log("expectedAmountOut to string ", expectedAmountOut.toString());
+            //console.log("expectedAmountOut retour en NON wei", web3.utils.fromWei(expectedAmountOut.toString(), 'ether'));
+            setAmountOut(expectedAmountOut.toString()); //returned amount is already in Wei
 
-    //     //swaping
-    //     await dexPool.methods.swapTokens(tokenA, tokenB, amountInInWei, amountOut).send({from: account});
-    //     alert("Swap successfuly done");
-    // }
+            //approve poolContract to spend amountIn of tokenA
+            await approveToken(tokenA, poolAddress, connectedAccount, amountIn);
 
-    // return(
-    //     <div>
-    //         <h1>Swap</h1>
-    //         <input placeholder="Token A" value={tokenA} onChange={(e) => setTokenA(e.target.value)} />
-    //         <input placeholder="Token B" value={tokenB} onChange={(e) => setTokenB(e.target.value)} />
-    //         <input type="number" placeholder="Amount" value={amountIn} onChange={(e) => setAmountIn(e.target.value)} />
-    //         <button onClick={handleSwap}>Swap</button>
-    //     </div>
-    // );
+            //debuging logs 
+            console.log("amountInWei : ", amountInInWei);
+            console.log("amountOut : ", amountOut);
+
+            //perform swap
+            await poolContract.methods.swapTokens(tokenA, tokenB, amountInInWei, amountOut).send({from: connectedAccount});
+            alert("Swap successfuly done");
+            
+        } catch (err) {
+            console.error("Error while swaping : ", err);
+            alert("An error occured while swapping");
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    if(loading) return <p>Loading...</p>
+
     return(
-        <p>swap</p>
+        <div>
+            <WalletBox
+                connectedAccount={connectedAccount}
+                setConnectedAccount={setConnectedAccount}
+            />
+            <h1>Swap</h1>
+            <label>
+                TokenA address
+                <input type='text' value={tokenA} onChange={(e) => setTokenA(e.target.value)} />
+            </label>
+            <label>
+                TokenB address
+                <input type='text' value={tokenB} onChange={(e) => setTokenB(e.target.value)} />
+            </label>
+            <label>
+                Amount to swap (from A to B)
+                <input type="number" placeholder="Amount" value={amountIn} onChange={(e) => setAmountIn(e.target.value)} />
+            </label>
+            {poolAddress && <p>Selected pool : {poolAddress}</p>}
+            <button onClick={findPool} disabled={loading}>Find the pool</button>
+            <button onClick={handleSwap} disabled={loading || !poolAddress || !connectedAccount}>Swap</button>
+        </div>
     );
 };
 

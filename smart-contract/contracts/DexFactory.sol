@@ -38,4 +38,12 @@ contract DexFactory {
     function getAllPools() external view returns (address[] memory) {
         return allPools;
     }
+
+    function getPoolAddress(
+        address tokenA,
+        address tokenB
+    ) external view returns (address) {
+        //retuning the info contained in the mapping
+        return getPool[tokenA][tokenB];
+    }
 }
