@@ -1,10 +1,12 @@
 import React, {useEffect, useState} from "react";
 import web3 from "../utils/web3";
+
 //import utils
-import { getPoolDetails } from "../utils/poolContract";
+import { getPoolDetails, getLPTokenInfo } from "../utils/poolContract";
 
 const PoolItem = ({poolAddress}) => {
-    const [details, setDetails] = useState(null);
+    const [details, setDetails] = useState('');
+    const [LPTokenInfo, setLPTokenInfo] = useState('');
 
     useEffect(() => {
         const fetchPoolDetails = async () => {
@@ -17,7 +19,18 @@ const PoolItem = ({poolAddress}) => {
             }
         };
 
+        const fetchLPTokenInfo = async () => {
+            try {
+                //fetch LP token infos using utils
+                const LPDetails = await getLPTokenInfo(poolAddress);
+                setLPTokenInfo(LPDetails);
+            } catch (err) {
+                console.error("Error while fetching LP token info :", err);
+            }
+        }
+
         fetchPoolDetails();
+        fetchLPTokenInfo();
     }, [poolAddress]);
 
     if(!details) return <div>Loading pool details...</div>
@@ -28,6 +41,9 @@ const PoolItem = ({poolAddress}) => {
             <p>Token A : {details.tokenA}</p>
             <p>Token B : {details.tokenB}</p>
             <p>Reserves : {web3.utils.fromWei(details.reserves.tokenA, 'ether')} / {web3.utils.fromWei(details.reserves.tokenB, 'ether')}</p>
+
+            <p>LPToken Name : {LPTokenInfo.name}</p>
+            <p>LPToken address : {LPTokenInfo.lpTokenAddress}</p>
         </div>
     );
 };

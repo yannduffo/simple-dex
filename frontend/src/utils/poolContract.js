@@ -1,5 +1,10 @@
 import web3 from "./web3";
+
+//import abi files
 import DexPool from '../assets/abi/DexPool.json';
+import DexLiquidityToken from '../assets/abi/DexLiquidityToken.json';
+
+//import utils
 import { approveToken } from "./tokenContract";
 
 // creating a web3.eth.Contract instance for a designted pool
@@ -44,6 +49,22 @@ export const getPoolDetails = async (poolAddress) => {
     };
 
 };
+
+export const getLPTokenInfo = async (poolAddress) => {
+    //creating contract instance
+    const poolContract = getDexPoolContract(poolAddress);
+
+    // getting LPtoken address & creating LPtoken Contract instance
+    const lpTokenAddress = await poolContract.methods.liquidityToken().call();
+    const lpTokenContract = new web3.eth.Contract(DexLiquidityToken.abi, lpTokenAddress);
+
+    //getting info from LPtoken contract instance
+    const name = await lpTokenContract.methods.name().call();
+    const symbol = await lpTokenContract.methods.symbol().call();
+    const totalSupply = await lpTokenContract.methods.totalSupply().call();
+
+    return {name, symbol, totalSupply, lpTokenAddress,};
+}
 
 /**
  * Add liquidity to a pool

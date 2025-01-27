@@ -42,6 +42,13 @@ contract DexPool {
         uint amountToken2
     );
 
+    /**
+     * @notice Initializes the pool with token pair and creates a LP token
+     * @param _token1 Address of the first token in the pair
+     * @param _token2 Address of the second token in the pair
+     * @param _liquidityTokenName Name of the liquidity token
+     * @param _liquidityTokenSymbol Symbol of the liquidity token
+     */
     constructor(
         address _token1,
         address _token2,
@@ -57,6 +64,11 @@ contract DexPool {
         );
     }
 
+    /**
+     * @notice Adds liquidity to the pool
+     * @param amountToken1 Amount of token1 to add
+     * @param amountToken2 Amount of token2 to add
+     */
     function addLiquidity(uint amountToken1, uint amountToken2) external {
         //checkings ------------------------------------------------------------------------------------------
         require(
@@ -111,6 +123,10 @@ contract DexPool {
         emit LiquidityAdded(msg.sender, amountToken1, amountToken2);
     }
 
+    /**
+     * @notice Removes liquidity from the pool
+     * @param amountOfLiquidity Amount of liquidity tokens to burn
+     */
     function removeLiquidity(uint amountOfLiquidity) external {
         uint256 totalLiquidityTokenSupply = liquidityToken.totalSupply();
 
@@ -157,6 +173,14 @@ contract DexPool {
         emit LiquidityRemoved(msg.sender, amount1, amount2);
     }
 
+    /**
+     * @notice Swaps tokens within the pool, ensuring constant formula (x * y = K) is preserved
+     * @param fromToken The address of the token to swap from
+     * @param toToken The address of the token to swap to
+     * @param amountIn The amount of `fromToken` to swap
+     * @param amountOut The promised amount of `toToken` expected to receive
+     * @dev Ensures the swap respects the constant formula, fees are applied, and reserves are updated.
+     */
     function swapTokens(
         address fromToken,
         address toToken,
@@ -193,7 +217,7 @@ contract DexPool {
         //calculation logic :
         //in case amountIn token1 reserve1 and amountOut token2 reserve2
         //we want to keep this formula true : reserve1 * reserve2 = constantK
-        // (reserve1 + amountIn) * (reserve2 - expectedAmountOut) = constantK
+        //(reserve1 + amountIn) * (reserve2 - expectedAmountOut) = constantK
         //so expectedAmountOut = reserve2 - constantK/(reserve1 + amountIn)
         if (fromToken == token1 && toToken == token2) {
             expectedAmountOut = reserve2.sub(
@@ -245,7 +269,14 @@ contract DexPool {
         require(constantK > 0, "Error, constant fromula not updated");
     }
 
-    //returning the minimum expectedAmountOut for a swap (used by frontend)
+    /**
+     * @notice Returns the expected output amount for a given input swap (for frontend indicaiton)
+     * @param fromToken The address of the token to swap from
+     * @param toToken The address of the token to swap to
+     * @param amountIn The amount of `fromToken` to swap
+     * @return expectedMinimumAmountOut The expected amount of `toToken` to receive after fees
+     * @dev Calculates the output considering a 0.3% fee on the input amount.
+     */
     function getExpectedAmountOut(
         address fromToken,
         address toToken,
@@ -260,7 +291,12 @@ contract DexPool {
         }
     }
 
-    //returning reserve values
+    /**
+     * @notice Returns the current reserves of token1 and token2
+     * @return valueReserve1 The reserve amount of token1
+     * @return valueReserve2 The reserve amount of token2
+     * @dev Uses `IERC20` balanceOf to fetch the actual reserve amounts.
+     */
     function getReserves()
         public
         view
@@ -271,10 +307,15 @@ contract DexPool {
         return (valueReserve1, valueReserve2);
     }
 
+    /**
+     * @notice Returns the addresses of the token pair in the pool
+     * @return addrToken1 The address of token1
+     * @return addrToken2 The address of token2
+     */
     function getTokenAddresses()
         public
         view
-        returns (address addToken1, address addrToken2)
+        returns (address addrToken1, address addrToken2)
     {
         return (token1, token2);
     }
