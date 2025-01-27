@@ -2,7 +2,7 @@ import React, {useState, useEffect} from 'react';
 
 //import utils
 import { dexFactory } from '../utils/factoryContract';
-import { addLiquidity } from '../utils/poolContract';
+import { addLiquidity, removeLiquidity } from '../utils/poolContract';
 import web3 from '../utils/web3';
 
 //import components
@@ -20,6 +20,8 @@ const Pool = () => {
     const [amountToken1, setAmountToken1] = useState('');
     const [amountToken2, setAmountToken2] = useState('');
     const [selectedPool, setSelectedPool] = useState('');
+    //form inputs for removing liquidity
+    const [amountLPToken, setAmountLPToken] = useState('');
 
     //load existing pools
     useEffect(() => {
@@ -95,6 +97,32 @@ const Pool = () => {
         }
     };
 
+    //removing liquidity
+    const handleRemoveLiquidity = async () => {
+        //checkings
+        if(!connectedAccount) {
+            alert("Please connect a wallet first"); 
+            return;
+        }
+        if(!web3.utils.isAddress(selectedPool)){
+            alert("Invalid pool address");
+            return;
+        }
+        if(!amountLPToken || amountLPToken <= 0) {
+            alert("Please enter a valid amount of LPToken to remove");
+        }
+
+        try {
+            setLoading(true);
+            await removeLiquidity(selectedPool, amountLPToken, connectedAccount);
+            alert("Liquidity successfully removed");
+        } catch (err) {
+            console.error("Error while removing liquidity", err);
+        } finally {
+            setLoading(false);
+        }
+    }
+
     if(loading) return <p>Loading...</p>
 
     return(
@@ -137,6 +165,18 @@ const Pool = () => {
                     <input type='text' value={amountToken2} onChange={(e) => setAmountToken2(e.target.value)}/>
                 </label>
                 <button onClick={handleAddLiquidity} disabled={!connectedAccount || loading}>Add Liquidity</button>
+            </div>
+            <div>
+                <p>Remove Liquidity</p>
+                <label>
+                    Pool address
+                    <input type='text' value={selectedPool} onChange={(e) => setSelectedPool(e.target.value)}/>
+                </label>
+                <label>
+                    LPToken amount to remove
+                    <input type='text' value={amountLPToken} onChange={(e) => setAmountLPToken(e.target.value)}/>
+                </label>
+                <button onClick={handleRemoveLiquidity} disabled={!connectedAccount || loading}>Remove Liquidity</button>
             </div>
         </div>
     );

@@ -92,6 +92,29 @@ export const addLiquidity = async (poolAddress, amountToken1, amountToken2, acco
 
     //reqeust to SC
     await poolContract.methods.addLiquidity(amountToken1InWei, amountToken2InWei).send({from: account});
-
     console.log(`Liquidity added to pool : ${poolAddress}`);
+}
+
+/**
+ * Remove liquidity from a pool
+ * @async
+ * @param {string} poolAddress The address of the pool contract
+ * @param {uint} amountOfLiquidity The amount of liquidity tokens to burn
+ * @param {string} account The address of the user removing liquidity
+ */
+export const removeLiquidity = async (poolAddress, amountOfLiquidity, account) => {
+    //creating pool contract instance
+    const poolContract = getDexPoolContract(poolAddress);
+
+    //getting liquidityToken address and creating contract instance
+    const lpTokenAddress = await poolContract.methods.liquidityToken().call();
+    const lpTokenContract = new web3.eth.Contract(DexLiquidityToken.abi, lpTokenAddress);
+
+    //approve the pool contract to brun our amount of LPTokens
+    const amountOfLiquidityInWei = web3.utils.toWei(amountOfLiquidity.toString(), 'ether');
+    await lpTokenContract.methods.approve(poolAddress, amountOfLiquidityInWei).send({from: account});
+
+    //request to SC
+    await poolContract.methods.removeLiquidity(amountOfLiquidityInWei).send({from: account});
+    console.log(`Removed ${amountOfLiquidity} LP Tokens`);
 }
