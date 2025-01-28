@@ -3,6 +3,7 @@ import web3 from "../utils/web3";
 
 //import utils
 import { getPoolDetails, getLPTokenInfo } from "../utils/poolContract";
+import { corTableAddrSymbol } from "../utils/tokenContract";
 
 const PoolItem = ({poolAddress}) => {
     const [details, setDetails] = useState('');
@@ -38,12 +39,12 @@ const PoolItem = ({poolAddress}) => {
     return(
         <div>
             <p>Pool address : {poolAddress}</p>
-            <p>Token A : {details.tokenA}</p>
-            <p>Token B : {details.tokenB}</p>
+            <p>Token A : {corTableAddrSymbol.get(details.tokenA)}</p>
+            <p>Token B : {corTableAddrSymbol.get(details.tokenB)}</p>
             <p>Reserves : {web3.utils.fromWei(details.reserves.tokenA, 'ether')} / {web3.utils.fromWei(details.reserves.tokenB, 'ether')}</p>
 
-            <p>LPToken Name : {LPTokenInfo.name}</p>
-            <p>LPToken address : {LPTokenInfo.lpTokenAddress}</p>
+            <p>LPToken : {LPTokenInfo.name}</p>
+            {/* <p>LPToken address : {LPTokenInfo.lpTokenAddress}</p>*/}
         </div>
     );
 };

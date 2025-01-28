@@ -1,45 +1,21 @@
 import React, {useEffect, useState} from 'react';
 
 //import utils
-import tokenContracts from '../utils/tokenContract';
+import { corTableNameAddr, corTableSymbAddr } from '../utils/tokenContract';
 
 const Token = () => {
-    const [tokens, setTokens] = useState('');
-    const [loading, setLoading] = useState('true');
+    const [tokens, setTokens] = useState([]);
 
     useEffect(() => {
-        const fetchTockens = async () => {
-            try {
-                //func to get token details
-                const fetchTokenDetails = async (tokenContrat, tokenAddress) => {
-                    try{
-                        const name = await tokenContrat.methods.name().call();
-                        const symbol = await tokenContrat.methods.symbol().call();
-                        return {name, symbol, address: tokenAddress};
-        
-                    } catch(err) {
-                        console.error("Error during token detail fetching", err);
-                        return null;
-                    }
-                };
-        
-                //get details from all fictive tokens
-                const tokenDetails = await Promise.all(
-                    Object.entries(tokenContracts).map(([tokenAddress, tokenContrat]) => fetchTokenDetails(tokenContrat, tokenAddress))
-                );
-                setTokens(tokenDetails.filter(Boolean)); //filter to add only valid tokens to local state variable
-        
-            } catch (error) {
-                console.error(" Error while charging token details", error);
-            } finally{
-                setLoading(false);
-            }
-        }
-        
-        fetchTockens();
-    }, []);
+        //creating an array from correspondanceTables 
+        const tokensArray = Array.from(corTableNameAddr.entries()).map(([name, address]) => {
+            //get the symbol
+            const symbol = Array.from(corTableSymbAddr.entries()).find(([, addr]) => addr === address)?.[0];
+            return {name, symbol, address};
+        })
 
-    if(loading) return <p>Tokens fetching...</p>
+        setTokens(tokensArray);
+    }, []);
 
     return(
         <div>

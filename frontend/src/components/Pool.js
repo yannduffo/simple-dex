@@ -3,6 +3,7 @@ import React, {useState, useEffect} from 'react';
 //import utils
 import { dexFactory } from '../utils/factoryContract';
 import { addLiquidity, removeLiquidity } from '../utils/poolContract';
+import { corTableSymbAddr } from '../utils/tokenContract';
 import web3 from '../utils/web3';
 
 //import components
@@ -47,7 +48,7 @@ const Pool = () => {
             alert("Please connect a wallet first");
             return;
         }
-        if(!web3.utils.isAddress(tokenA) || !web3.utils.isAddress(tokenB)){
+        if(!web3.utils.isAddress(corTableSymbAddr.get(tokenA)) || !web3.utils.isAddress(corTableSymbAddr.get(tokenB))){
             alert("invalid address for token A or token B");
             return;
         }
@@ -55,7 +56,7 @@ const Pool = () => {
         //calling createPool method from dexFactory SC
         try {
             setLoading(true);
-            await dexFactory.methods.createPool(tokenA, tokenB).send({from: connectedAccount});
+            await dexFactory.methods.createPool(corTableSymbAddr.get(tokenA), corTableSymbAddr.get(tokenB)).send({from: connectedAccount});
             alert("Pool successfully created");
 
             //reload pool list
@@ -142,11 +143,11 @@ const Pool = () => {
             <div>
                 <p>Add a new pool</p>
                 <label>
-                    TokenA address
-                    <input type='text' value={tokenA} onChange={(e) => setTokenA(e.target.value)}/>
+                    TokenA symbol
+                    <input type='text' placeholder='Txxx' value={tokenA} onChange={(e) => setTokenA(e.target.value)}/>
                 </label>
-                <label>TokenB address
-                    <input type='text' value={tokenB} onChange={(e) => setTokenB(e.target.value)}/>
+                <label>TokenB symbol
+                    <input type='text' placeholder='Tyyy' value={tokenB} onChange={(e) => setTokenB(e.target.value)}/>
                 </label>
                 <button onClick={createPool} disabled={!connectedAccount || loading}>Create pool</button>
             </div>
