@@ -113,7 +113,7 @@ const Swap = () => {
 
     return(
         <div class="flex justify-center items-center mt-20">
-            <div class="flex flex-col bg-blue-50 p-4 border gap-2 rounded-xl w-full max-w-lg">
+            <div class="flex flex-col bg-slate-50 p-4 border gap-2 rounded-xl w-full max-w-xl shadow-lg">
                 <div>
                     <h1 class=" font-bold text-xl ">Swap</h1>
                 </div>
@@ -123,7 +123,7 @@ const Swap = () => {
                         setConnectedAccount={setConnectedAccount}
                     />
                 </div>
-                <div class="flex flex-col bg-blue-100 rounded-lg p-2 gap-2 items-center">
+                <div class="flex flex-col bg-slate-100 rounded-lg p-2 gap-2 items-center">
                     <label class="flex justify-between w-full">
                         TokenA symbol
                         <input type='text' placeholder='Txxx' value={tokenA} onChange={(e) => setTokenA(e.target.value)} />
@@ -139,7 +139,7 @@ const Swap = () => {
                     <button 
                         onClick={findPool} 
                         disabled={loading}
-                        class="py-1.5 px-3 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 w-2/5
+                        class="py-1.5 px-3 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-slate-700 w-2/5
                         disabled:bg-gray-200 disabled:text-gray-50 disabled:cursor-not-allowed"
                     >Find the pool</button>
                     {/* Pool found & expected amoount printings */}
@@ -148,12 +148,12 @@ const Swap = () => {
                         <span className="ml-1">{corTableAddrSymbol.get(details.tokenA)} - {corTableAddrSymbol.get(details.tokenB)}</span>
                     </p>}
                     {expectedAmountOutEth !== null && (
-                        <p class=" bg-blue-200 flex justify-start w-full rounded-md p-2">Expected amout out from swap : {expectedAmountOutEth}</p>
+                        <p class=" bg-slate-200 flex justify-start w-full rounded-md p-2">Expected amout out from swap : {expectedAmountOutEth}</p>
                     )}
                     <button 
                         onClick={handleSwap} 
                         disabled={loading || !poolAddress || !connectedAccount || !expectedAmountOutEth}
-                        class="py-1.5 px-3 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 w-2/5
+                        class="py-1.5 px-3 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-slate-700 w-2/5
                         disabled:bg-gray-200 disabled:text-gray-50 disabled:cursor-not-allowed"
                     >Swap</button>
                 </div>

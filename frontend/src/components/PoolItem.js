@@ -37,7 +37,7 @@ const PoolItem = ({poolAddress}) => {
     if(!details) return <div>Loading pool details...</div>
 
     return(
-        <div class="bg-blue-200 rounded-md p-2">
+        <div class="bg-slate-200 rounded-md p-2">
             <p>Pool address : {poolAddress}</p>
             <p>Token A : {corTableAddrSymbol.get(details.tokenA)}</p>
             <p>Token B : {corTableAddrSymbol.get(details.tokenB)}</p>

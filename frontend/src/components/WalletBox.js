@@ -18,7 +18,7 @@ const WalletBox = ({connectedAccount, setConnectedAccount}) => {
     }
 
     return (
-        <div class="bg-blue-100 rounded-lg p-2 ">
+        <div class="bg-slate-100 rounded-lg p-2 ">
             { connectedAccount ? (
                 <div class="flex justify-between items-center">
                     <div class="mr-8">
@@ -27,7 +27,7 @@ const WalletBox = ({connectedAccount, setConnectedAccount}) => {
                     </div>
                     <button 
                         onClick={disconnectWallet}
-                        class="py-1.5 px-3 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700"
+                        class="py-1.5 px-3 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-slate-700"
                     >Disconnect Metamask</button>
                 </div>
             ) : (
@@ -35,7 +35,7 @@ const WalletBox = ({connectedAccount, setConnectedAccount}) => {
                     <p>Wallet connexion</p>
                     <button 
                         onClick={connectWallet}
-                        class="py-1.5 px-3 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700"
+                        class="py-1.5 px-3 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-slate-700"
                     >Connect Metamask</button>
                 </div>
             )}

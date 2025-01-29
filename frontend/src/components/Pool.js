@@ -1,4 +1,5 @@
 import React, {useState, useEffect} from 'react';
+import { FaChevronDown, FaChevronUp } from 'react-icons/fa';
 
 //import utils
 import { dexFactory } from '../utils/factoryContract';
@@ -23,6 +24,8 @@ const Pool = () => {
     const [selectedPool, setSelectedPool] = useState('');
     //form inputs for removing liquidity
     const [amountLPToken, setAmountLPToken] = useState('');
+    //redering 
+    const [isOpen, setIsOpen] = useState(false);
 
     //load existing pools
     useEffect(() => {
@@ -128,7 +131,7 @@ const Pool = () => {
 
     return(
         <div class="flex justify-center items-center my-20">
-            <div class="flex flex-col bg-blue-50 p-4 border gap-2 rounded-xl w-full max-w-3xl">
+            <div class="flex flex-col bg-slate-50 p-4 border border-slate-200 gap-2 rounded-xl w-full max-w-3xl shadow-lg">
                 <div>
                     <h1 class=" font-bold text-xl ">Pools</h1>
                 </div>
@@ -136,17 +139,25 @@ const Pool = () => {
                     connectedAccount={connectedAccount}
                     setConnectedAccount={setConnectedAccount}
                 />
-                <div class="bg-blue-100 rounded-lg p-2">
-                    <h2 class="font-bold text-lg">Available pools</h2>
-                    <div class="flex flex-col gap-2">
-                    {pools.length === 0 ? (
-                        <p class="italic">Not any pool created</p>
-                    ):(
-                        pools.map((pool, index) => <PoolItem key={index} poolAddress={pool}/>)
-                    )}
+                <div class="bg-slate-100 rounded-lg p-2">
+                    <div className="flex justify-between items-center">
+                        <h2 className="font-bold text-lg">Available pools</h2>
+                        {/* button to print the pool list */}
+                        <button onClick={() => setIsOpen(!isOpen)} className="text-slate-600 hover:text-slate-800 pr-[8px]">
+                            {isOpen ? <FaChevronUp /> : <FaChevronDown />}
+                        </button>
+                    </div>
+
+                    {/* pool list (printed or hidden) */}
+                    <div className={`flex flex-col gap-2 transition-all duration-500 ${isOpen ? "block" : "hidden"}`}>
+                        {pools.length === 0 ? (
+                            <p className="italic">Not any pool created</p>
+                        ) : (
+                            pools.map((pool, index) => <PoolItem key={index} poolAddress={pool} />)
+                        )}
                     </div>
                 </div>
-                <div class="bg-blue-100 rounded-lg p-2">
+                <div class="bg-slate-100 rounded-lg p-2">
                     <h2 class="font-bold text-lg">Add a new pool</h2>
                     <div class="flex flex-col items-center gap-2">
                         <label class="flex justify-around w-full">
@@ -160,12 +171,12 @@ const Pool = () => {
                         <button 
                             onClick={createPool} 
                             disabled={!connectedAccount || loading}
-                            class="py-1.5 px-3 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 w-2/5
+                            class="py-1.5 px-3 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-slate-700 w-2/5
                             disabled:bg-gray-200 disabled:text-gray-50 disabled:cursor-not-allowed"
                         >Create pool</button>
                     </div>
                 </div>
-                <div class="bg-blue-100 rounded-lg p-2">
+                <div class="bg-slate-100 rounded-lg p-2">
                     <h2 class="font-bold text-lg">Add liquidity</h2>
                     <div class="flex flex-col items-center gap-2">
                         <label class="flex justify-around w-full">
@@ -183,13 +194,13 @@ const Pool = () => {
                         <button 
                             onClick={handleAddLiquidity} 
                             disabled={!connectedAccount || loading}
-                            class="py-1.5 px-3 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 w-2/5
+                            class="py-1.5 px-3 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-slate-700 w-2/5
                             disabled:bg-gray-200 disabled:text-gray-50 disabled:cursor-not-allowed"
                         >Add Liquidity</button>
                     </div>
                     
                 </div>
-                <div class="bg-blue-100 rounded-lg p-2">
+                <div class="bg-slate-100 rounded-lg p-2">
                     <h2 class="font-bold text-lg">Remove Liquidity</h2>
                     <div class="flex flex-col items-center gap-2">
                         <label class="flex justify-around w-full">
@@ -203,7 +214,7 @@ const Pool = () => {
                         <button 
                             onClick={handleRemoveLiquidity} 
                             disabled={!connectedAccount || loading}
-                            class="py-1.5 px-3 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 w-2/5
+                            class="py-1.5 px-3 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-slate-700 w-2/5
                             disabled:bg-gray-200 disabled:text-gray-50 disabled:cursor-not-allowed"
                         >Remove Liquidity</button>
                     </div>
