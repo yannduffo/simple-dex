@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 
 //import utils
 import { getPoolAddress} from '../utils/factoryContract';
-import { getDexPoolContract} from '../utils/poolContract';
-import { approveToken, corTableSymbAddr } from '../utils/tokenContract';
+import { getDexPoolContract, getPoolDetails} from '../utils/poolContract';
+import { approveToken, corTableSymbAddr, corTableAddrSymbol } from '../utils/tokenContract';
 import web3 from '../utils/web3';
 
 //import components
@@ -15,6 +15,7 @@ const Swap = () => {
     const [tokenB, setTokenB] = useState('');
     const [amountIn, setAmountIn] = useState('');
     const [poolAddress, setPoolAddress] = useState('');
+    const [details, setDetails] = useState('');
     //for account connexion
     const [connectedAccount, setConnectedAccount] = useState(null)
     const [loading, setLoading] = useState(false);
@@ -27,6 +28,7 @@ const Swap = () => {
             setLoading(true);
             const address = await getPoolAddress(corTableSymbAddr.get(tokenA), corTableSymbAddr.get(tokenB));
             console.log("Pool found : ", address);
+            fetchPoolDetails(address.toString());
             setPoolAddress(address);
         } catch (err) {
             alert("No pool available to swap these 2 tokens, check the tokens or the pool list")
@@ -35,6 +37,16 @@ const Swap = () => {
             setLoading(false);
         }
     }
+
+    const fetchPoolDetails = async (poolAddr) => {
+        try {
+            //fetch token infos and pool reserve calling utils/poolContract.js
+            const poolDetails = await getPoolDetails(poolAddr);
+            setDetails(poolDetails);
+        } catch (err) {
+            console.error("Error while fetching pool details : ", err);
+        }
+    };
 
     //printing expectedValue in ETH before swapping
     useEffect(() => {
@@ -100,31 +112,54 @@ const Swap = () => {
     if(loading) return <p>Loading...</p>
 
     return(
-        <div>
-            <WalletBox
-                connectedAccount={connectedAccount}
-                setConnectedAccount={setConnectedAccount}
-            />
-            <h1>Swap</h1>
-            <label>
-                TokenA symbol
-                <input type='text' placeholder='Txxx' value={tokenA} onChange={(e) => setTokenA(e.target.value)} />
-            </label>
-            <label>
-                TokenB symbol
-                <input type='text' placeholder='Tyyy' value={tokenB} onChange={(e) => setTokenB(e.target.value)} />
-            </label>
-            <label>
-                Amount to swap (from A to B)
-                <input type="number" placeholder="Amount" value={amountIn} onChange={(e) => setAmountIn(e.target.value)} />
-            </label>
-            {poolAddress && <p>Selected pool : {poolAddress}</p>}
-            {expectedAmountOutEth !== null && (
-                <p>Expected amout out from swap : {expectedAmountOutEth}</p>
-            )}
-            <button onClick={findPool} disabled={loading}>Find the pool</button>
-            <button onClick={handleSwap} disabled={loading || !poolAddress || !connectedAccount || !expectedAmountOutEth}>Swap</button>
+        <div class="flex justify-center items-center mt-20">
+            <div class="flex flex-col bg-blue-50 p-4 border gap-2 rounded-xl w-full max-w-lg">
+                <div>
+                    <h1 class=" font-bold text-xl ">Swap</h1>
+                </div>
+                <div>
+                    <WalletBox
+                        connectedAccount={connectedAccount}
+                        setConnectedAccount={setConnectedAccount}
+                    />
+                </div>
+                <div class="flex flex-col bg-blue-100 rounded-lg p-2 gap-2 items-center">
+                    <label class="flex justify-between w-full">
+                        TokenA symbol
+                        <input type='text' placeholder='Txxx' value={tokenA} onChange={(e) => setTokenA(e.target.value)} />
+                    </label>
+                    <label class="flex justify-between w-full">
+                        TokenB symbol
+                        <input type='text' placeholder='Tyyy' value={tokenB} onChange={(e) => setTokenB(e.target.value)} />
+                    </label>
+                    <label class="flex justify-between w-full">
+                        Amount to swap (A to B)
+                        <input type="number" placeholder="Amount" value={amountIn} onChange={(e) => setAmountIn(e.target.value)} />
+                    </label>
+                    <button 
+                        onClick={findPool} 
+                        disabled={loading}
+                        class="py-1.5 px-3 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 w-2/5
+                        disabled:bg-gray-200 disabled:text-gray-50 disabled:cursor-not-allowed"
+                    >Find the pool</button>
+                    {/* Pool found & expected amoount printings */}
+                    {poolAddress && 
+                    <p class="w-full">Selected pool :
+                        <span className="ml-1">{corTableAddrSymbol.get(details.tokenA)} - {corTableAddrSymbol.get(details.tokenB)}</span>
+                    </p>}
+                    {expectedAmountOutEth !== null && (
+                        <p class=" bg-blue-200 flex justify-start w-full rounded-md p-2">Expected amout out from swap : {expectedAmountOutEth}</p>
+                    )}
+                    <button 
+                        onClick={handleSwap} 
+                        disabled={loading || !poolAddress || !connectedAccount || !expectedAmountOutEth}
+                        class="py-1.5 px-3 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 w-2/5
+                        disabled:bg-gray-200 disabled:text-gray-50 disabled:cursor-not-allowed"
+                    >Swap</button>
+                </div>
+            </div>
         </div>
+        
     );
 };
 

@@ -5,7 +5,7 @@ const WalletBox = ({connectedAccount, setConnectedAccount}) => {
         try {
             const accounts = await window.ethereum.request({method: 'eth_requestAccounts'});
             setConnectedAccount(accounts[0]); //update parent state
-            alert("Metamask connected");
+            //alert("Metamask connected");
         } catch (err) {
             console.error("Error while connecting metamask wallet", err);
             alert("Metamask wallet connection failed");
@@ -14,19 +14,30 @@ const WalletBox = ({connectedAccount, setConnectedAccount}) => {
 
     const disconnectWallet = () => {
         setConnectedAccount(null); //update parent state
-        alert("Metamask disconnected");
+        //alert("Metamask disconnected");
     }
 
     return (
-        <div>
-            <p>Wallet box</p>
+        <div class="bg-blue-100 rounded-lg p-2 ">
             { connectedAccount ? (
-                <div>
-                    <p>Connected as : {connectedAccount}</p>
-                    <button onClick={disconnectWallet}>Disconnect Metamask</button>
+                <div class="flex justify-between items-center">
+                    <div class="mr-8">
+                        <p class="text-md">Connected as : </p>
+                        <p class="text-xs">{connectedAccount}</p>
+                    </div>
+                    <button 
+                        onClick={disconnectWallet}
+                        class="py-1.5 px-3 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700"
+                    >Disconnect Metamask</button>
                 </div>
             ) : (
-                <button onClick={connectWallet}>Connect Metamask</button>
+                <div class="flex justify-between items-center">
+                    <p>Wallet connexion</p>
+                    <button 
+                        onClick={connectWallet}
+                        class="py-1.5 px-3 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700"
+                    >Connect Metamask</button>
+                </div>
             )}
         </div>
     );

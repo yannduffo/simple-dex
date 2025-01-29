@@ -127,59 +127,91 @@ const Pool = () => {
     if(loading) return <p>Loading...</p>
 
     return(
-        <div>
-            <WalletBox
-                connectedAccount={connectedAccount}
-                setConnectedAccount={setConnectedAccount}
-            />
-            <p>Available pools</p>
-            <div>
-            {pools.length === 0 ? (
-                <p>Not any pool created</p>
-            ):(
-                pools.map((pool, index) => <PoolItem key={index} poolAddress={pool}/>)
-            )}
-            </div>
-            <div>
-                <p>Add a new pool</p>
-                <label>
-                    TokenA symbol
-                    <input type='text' placeholder='Txxx' value={tokenA} onChange={(e) => setTokenA(e.target.value)}/>
-                </label>
-                <label>TokenB symbol
-                    <input type='text' placeholder='Tyyy' value={tokenB} onChange={(e) => setTokenB(e.target.value)}/>
-                </label>
-                <button onClick={createPool} disabled={!connectedAccount || loading}>Create pool</button>
-            </div>
-            <div>
-                <p>Add liquidity</p>
-                <label>
-                    Pool address
-                    <input type='text' value={selectedPool} onChange={(e) => setSelectedPool(e.target.value)}/>
-                </label>
-                <label>
-                    Token1 amount
-                    <input type='text' value={amountToken1} onChange={(e) => setAmountToken1(e.target.value)}/>
-                </label>
-                <label>
-                    Token2 amount
-                    <input type='text' value={amountToken2} onChange={(e) => setAmountToken2(e.target.value)}/>
-                </label>
-                <button onClick={handleAddLiquidity} disabled={!connectedAccount || loading}>Add Liquidity</button>
-            </div>
-            <div>
-                <p>Remove Liquidity</p>
-                <label>
-                    Pool address
-                    <input type='text' value={selectedPool} onChange={(e) => setSelectedPool(e.target.value)}/>
-                </label>
-                <label>
-                    LPToken amount to remove
-                    <input type='text' value={amountLPToken} onChange={(e) => setAmountLPToken(e.target.value)}/>
-                </label>
-                <button onClick={handleRemoveLiquidity} disabled={!connectedAccount || loading}>Remove Liquidity</button>
+        <div class="flex justify-center items-center my-20">
+            <div class="flex flex-col bg-blue-50 p-4 border gap-2 rounded-xl w-full max-w-3xl">
+                <div>
+                    <h1 class=" font-bold text-xl ">Pools</h1>
+                </div>
+                <WalletBox
+                    connectedAccount={connectedAccount}
+                    setConnectedAccount={setConnectedAccount}
+                />
+                <div class="bg-blue-100 rounded-lg p-2">
+                    <h2 class="font-bold text-lg">Available pools</h2>
+                    <div class="flex flex-col gap-2">
+                    {pools.length === 0 ? (
+                        <p class="italic">Not any pool created</p>
+                    ):(
+                        pools.map((pool, index) => <PoolItem key={index} poolAddress={pool}/>)
+                    )}
+                    </div>
+                </div>
+                <div class="bg-blue-100 rounded-lg p-2">
+                    <h2 class="font-bold text-lg">Add a new pool</h2>
+                    <div class="flex flex-col items-center gap-2">
+                        <label class="flex justify-around w-full">
+                            TokenA symbol
+                            <input type='text' placeholder='Txxx' value={tokenA} onChange={(e) => setTokenA(e.target.value)}/>
+                        </label>
+                        <label class="flex justify-around w-full">
+                            TokenB symbol
+                            <input type='text' placeholder='Tyyy' value={tokenB} onChange={(e) => setTokenB(e.target.value)}/>
+                        </label>
+                        <button 
+                            onClick={createPool} 
+                            disabled={!connectedAccount || loading}
+                            class="py-1.5 px-3 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 w-2/5
+                            disabled:bg-gray-200 disabled:text-gray-50 disabled:cursor-not-allowed"
+                        >Create pool</button>
+                    </div>
+                </div>
+                <div class="bg-blue-100 rounded-lg p-2">
+                    <h2 class="font-bold text-lg">Add liquidity</h2>
+                    <div class="flex flex-col items-center gap-2">
+                        <label class="flex justify-around w-full">
+                            Pool address
+                            <input class="w-1/2 ml-3" type='text' placeholder="0x..." value={selectedPool} onChange={(e) => setSelectedPool(e.target.value)}/>
+                        </label>
+                        <label class="flex justify-around w-full">
+                            Token1 amount
+                            <input class="w-1/2" type='text' placeholder="1000" value={amountToken1} onChange={(e) => setAmountToken1(e.target.value)}/>
+                        </label>
+                        <label class="flex justify-around w-full">
+                            Token2 amount
+                            <input class="w-1/2" type='text' placeholder="1000" value={amountToken2} onChange={(e) => setAmountToken2(e.target.value)}/>
+                        </label>
+                        <button 
+                            onClick={handleAddLiquidity} 
+                            disabled={!connectedAccount || loading}
+                            class="py-1.5 px-3 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 w-2/5
+                            disabled:bg-gray-200 disabled:text-gray-50 disabled:cursor-not-allowed"
+                        >Add Liquidity</button>
+                    </div>
+                    
+                </div>
+                <div class="bg-blue-100 rounded-lg p-2">
+                    <h2 class="font-bold text-lg">Remove Liquidity</h2>
+                    <div class="flex flex-col items-center gap-2">
+                        <label class="flex justify-around w-full">
+                            Pool address
+                            <input class="w-1/2 ml-6" type='text' placeholder="0x..." value={selectedPool} onChange={(e) => setSelectedPool(e.target.value)}/>
+                        </label>
+                        <label class="flex justify-around w-full">
+                            LPToken amount
+                            <input class="w-1/2" type='text' placeholder="1000" value={amountLPToken} onChange={(e) => setAmountLPToken(e.target.value)}/>
+                        </label>
+                        <button 
+                            onClick={handleRemoveLiquidity} 
+                            disabled={!connectedAccount || loading}
+                            class="py-1.5 px-3 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 w-2/5
+                            disabled:bg-gray-200 disabled:text-gray-50 disabled:cursor-not-allowed"
+                        >Remove Liquidity</button>
+                    </div>
+                    
+                </div>
             </div>
         </div>
+        
     );
 };
 

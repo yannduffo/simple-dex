@@ -1,0 +1,17 @@
+[
+  {
+    "name": "TokenABC",
+    "symbol": "TABC",
+    "address": "0x5505F4780f2e19578E38853c8196Ba92029F831e"
+  },
+  {
+    "name": "TokenDEF",
+    "symbol": "TDEF",
+    "address": "0x0a0E3ED71f31C00e3503c6F6E7eD03D788b27973"
+  },
+  {
+    "name": "TokenXYZ",
+    "symbol": "TXYZ",
+    "address": "0xE5546903901fD2A60360b1E4c498C61aCc74E979"
+  }
+]

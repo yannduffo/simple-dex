@@ -2,16 +2,16 @@
   {
     "name": "TokenABC",
     "symbol": "TABC",
-    "address": "0x5505F4780f2e19578E38853c8196Ba92029F831e"
+    "address": "0x1B35605646e7983fcC280323483a6D0F9a0ecF65"
   },
   {
     "name": "TokenDEF",
     "symbol": "TDEF",
-    "address": "0x0a0E3ED71f31C00e3503c6F6E7eD03D788b27973"
+    "address": "0x24a5b9dF1e8fe1612b23088B93a8DEB734a37195"
   },
   {
     "name": "TokenXYZ",
     "symbol": "TXYZ",
-    "address": "0xE5546903901fD2A60360b1E4c498C61aCc74E979"
+    "address": "0xc555887E08Cf15e8da3cB142D005e9d5f6d6998c"
   }
 ]
