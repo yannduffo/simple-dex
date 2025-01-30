@@ -108,7 +108,7 @@ For more details, see `./frontend/README.md`.
 ### Clone the repository
 
 ```
-git clone <repository-url>
+git clone git@github.com:yannduffo/simple-dex.git
 ```
 
 Follow instructions from the 2 others `README.md`

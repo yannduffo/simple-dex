@@ -2,7 +2,7 @@
 
 ## Overview
 
-This project is a simple decentralized exchange (DEX) built using Solidity and Truffle. This directory is the one containing all "Blockchian related" code. It is supposed to work with the developped front-end. This simple DEX allows users to:
+This project is a simple decentralized exchange (DEX) built using Solidity and Truffle. This directory is the one containing all "Blockchian related" code. It is supposed to work with the developped front-end. **All the contracts are compatible with ERC-20 @openzeppelin standards**. This simple DEX allows users to:
 
 - Create liquidity pools.
 - Add or remove liquidity.
@@ -50,10 +50,12 @@ project-root/
 **DexLiquidityToken.sol :**
 
 - Simple ERC-20 token distributed to liquidity providers in exchange for deposits.
+- Permission are managed with **@openzeppelin AccessControl**
 
 **TestToken.sol :**
 
 - A simple ERC-20 token contract used to simulate trading pairs.
+- ERC-20 tokens are generated using **@openzeppelin strandards**
 
 ## Testing
 
